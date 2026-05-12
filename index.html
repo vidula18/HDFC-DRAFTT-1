@@ -21,8 +21,8 @@
 </head>
 <body>
     <!-- Polite and Assertive live regions (visually hidden) -->
-    <div id="polite-live" aria-live="polite" aria-atomic="true" class="sr-only"></div>
-    <div id="assertive-live" aria-live="assertive" aria-atomic="true" class="sr-only"></div>
+    <div id="polite-live" role="status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+    <div id="assertive-live" role="alert" aria-live="assertive" aria-atomic="true" class="sr-only"></div>
 
     <!-- Screen 1: Entry -->
     <main id="screen-entry" class="screen active fade-in" tabindex="-1">
@@ -65,11 +65,11 @@
             <h1 class="text-xl font-semibold" id="recipient-heading">Recipient Details</h1>
         </header>
         <section class="p-4 pt-6">
-            <div class="flex justify-between text-xs text-gray-500 mb-2">
+            <div class="flex justify-between text-xs text-gray-500 mb-2" aria-hidden="true">
                 <span>Step 1 of 4</span>
                 <span>25%</span>
             </div>
-            <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden mb-4">
+            <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden mb-4" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" aria-label="Step 1 of 4, 25% complete">
                 <div class="bg-blue-600 h-full" style="width: 25%"></div>
             </div>
             <form id="recipient-form" novalidate>
@@ -81,15 +81,15 @@
                     </div>
                     <div>
                         <label for="account-number" class="block text-sm font-medium text-gray-700 mb-1">Account Number</label>
-                        <input type="password" id="account-number" name="account-number" placeholder="Enter account number" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required pattern="\d{9,18}" aria-describedby="account-number-help">
+                        <input type="password" id="account-number" name="account-number" placeholder="Enter account number" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required pattern="\d{9,18}" aria-describedby="account-number-help account-number-error">
                         <p class="text-xs text-gray-500" id="account-number-help">9‑18 numeric digits.</p>
-                        <p class="text-xs text-red-600 hidden" id="account-number-error" role="alert" aria-live="assertive">Invalid account number.</p>
+                        <p class="text-xs text-red-600 hidden" id="account-number-error" role="alert" aria-live="assertive">Invalid account number. Please check the 9 to 18 digits.</p>
                     </div>
                     <div>
                         <label for="ifsc-code" class="block text-sm font-medium text-gray-700 mb-1">IFSC Code</label>
-                        <input type="text" id="ifsc-code" name="ifsc-code" placeholder="HDFC0001234" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required pattern="[A-Z]{4}0[0-9A-Z]{6}" aria-describedby="ifsc-help">
+                        <input type="text" id="ifsc-code" name="ifsc-code" placeholder="HDFC0001234" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required pattern="[A-Z]{4}0[0-9A-Z]{6}" aria-describedby="ifsc-help ifsc-error">
                         <p class="text-xs text-gray-500" id="ifsc-help">Format: XXXX0XXXXXX (e.g., HDFC0001234).</p>
-                        <p class="text-xs text-red-600 hidden" id="ifsc-error" role="alert" aria-live="assertive">Invalid IFSC code.</p>
+                        <p class="text-xs text-red-600 hidden" id="ifsc-error" role="alert" aria-live="assertive">Invalid IFSC code. Must be 11 characters.</p>
                     </div>
                 </div>
                 <button type="button" class="w-full hdfc-blue text-white py-4 rounded-xl font-semibold shadow-lg mt-8 transition-transform active:scale-95" onclick="validateRecipient()" aria-label="Continue to amount entry">Continue</button>
@@ -104,11 +104,11 @@
             <h1 class="text-xl font-semibold" id="amount-heading">Enter Amount</h1>
         </header>
         <section class="p-4 pt-6">
-            <div class="flex justify-between text-xs text-gray-500 mb-2">
+            <div class="flex justify-between text-xs text-gray-500 mb-2" aria-hidden="true">
                 <span>Step 2 of 4</span>
                 <span>50%</span>
             </div>
-            <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden mb-4">
+            <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden mb-4" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" aria-label="Step 2 of 4, 50% complete">
                 <div class="bg-blue-600 h-full" style="width: 50%"></div>
             </div>
             <div class="text-center py-10">
@@ -193,11 +193,12 @@
                 heading.focus();
             }
             // Announce screen change (polite)
+            const payeeName = document.getElementById('summary-payee-name') ? document.getElementById('summary-payee-name').textContent : '[Payee]';
             const announcements = {
-                'screen-entry': 'Entry screen. Choose a transfer mode.',
-                'screen-recipient': 'Recipient details screen. Please enter payee information.',
-                'screen-amount': 'Amount entry screen. Enter transfer amount.',
-                'screen-success': 'Transfer successful screen.'
+                'screen-entry': 'One-Time Transfer Entry. Choose your preferred transfer mode to begin. Two options available: IMPS and NEFT. Swipe or tab to select a mode.',
+                'screen-recipient': 'Recipient Details. Step 1 of 4, 25% complete. Enter payee full name, account number, and IFSC code. Swipe or tab to the Recipient Name field to start typing.',
+                'screen-amount': `Amount Entry. Step 2 of 4, 50% complete. Transferring to ${payeeName}. Enter the transfer amount and verify the source account. Swipe or tab to the Transfer Amount field.`,
+                'screen-success': `Transfer Successful. Your money has been sent securely. Amount sent: ₹25,000.00 to ${payeeName}. Swipe or tab to review transaction details or download your receipt.`
             };
             announcePolite(announcements[screenId] || '');
             // Haptic feedback for navigation
@@ -211,14 +212,17 @@
             let valid = true;
             // Reset previous errors
             [account, ifsc].forEach(inp => { inp.setAttribute('aria-invalid', 'false'); inp.classList.remove('border-red-500'); });
+            let firstInvalid = null;
+            
             // Account number validation
             if (!account.checkValidity()) {
                 valid = false;
                 document.getElementById('account-number-error').classList.remove('hidden');
                 account.setAttribute('aria-invalid', 'true');
                 account.classList.add('border-red-500');
-                announceAssertive('Invalid account number.');
+                announceAssertive('Invalid account number. Please check the 9 to 18 digits.');
                 haptic.warning();
+                firstInvalid = firstInvalid || account;
             }
             // IFSC validation
             if (!ifsc.checkValidity()) {
@@ -226,8 +230,13 @@
                 document.getElementById('ifsc-error').classList.remove('hidden');
                 ifsc.setAttribute('aria-invalid', 'true');
                 ifsc.classList.add('border-red-500');
-                announceAssertive('Invalid IFSC code.');
+                announceAssertive('Invalid IFSC code. Must be 11 characters.');
                 haptic.warning();
+                firstInvalid = firstInvalid || ifsc;
+            }
+            
+            if (!valid && firstInvalid) {
+                firstInvalid.focus();
             }
             if (valid) {
                 // Update summary text on amount screen
