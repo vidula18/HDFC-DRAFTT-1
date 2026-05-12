@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HDFC Bank - One-Time Transfer Prototype</title>
+    <title>One‑Time Transfer – Entry</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -16,165 +16,234 @@
         .screen.active { display: block; }
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
     </style>
 </head>
 <body>
+    <!-- Polite and Assertive live regions (visually hidden) -->
+    <div id="polite-live" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+    <div id="assertive-live" aria-live="assertive" aria-atomic="true" class="sr-only"></div>
 
     <!-- Screen 1: Entry -->
-    <div id="screen-entry" class="screen active fade-in">
+    <main id="screen-entry" class="screen active fade-in" tabindex="-1">
         <header class="hdfc-blue p-4 text-white flex items-center gap-3 sticky top-0 z-10">
-            <button class="p-2">←</button>
-            <h1 class="text-xl font-semibold">One-Time Transfer</h1>
+            <button class="p-2" aria-label="Back" disabled aria-hidden="true">←</button>
+            <h1 class="text-xl font-semibold">One‑Time Transfer</h1>
         </header>
-        <div class="p-4">
+        <section class="p-4">
             <div class="text-center mb-8 pt-6">
-                <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-10 h-10 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3-3v8a3 3 0 003 3z"></path></svg>
+                <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4" aria-hidden="true">
+                    <svg class="w-10 h-10 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3-3v8a3 3 0 003 3z"></path></svg>
                 </div>
-                <h2 class="text-2xl font-bold text-gray-900">Send Money Instantly</h2>
-                <p class="text-gray-600 text-sm mt-2">Choose your preferred transfer mode to begin</p>
+                <h2 class="text-2xl font-bold text-gray-900" id="entry-heading">Send Money Instantly</h2>
+                <p class="text-gray-600 text-sm mt-2" id="entry-desc">Choose your preferred transfer mode to begin</p>
             </div>
-
             <div class="space-y-4 mb-8">
-                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
-                    <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 font-bold">IMPS</div>
+                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4" role="button" tabindex="0" onclick="showScreen('screen-recipient')" aria-label="Select IMPS – Instant Payment">
+                    <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 font-bold" aria-hidden="true">IMPS</div>
                     <div>
                         <h3 class="font-semibold text-gray-900">Instant Payment</h3>
-                        <p class="text-xs text-gray-500">24x7 Availability • Real-time settlement</p>
+                        <p class="text-xs text-gray-500">24x7 Availability • Real‑time settlement</p>
                     </div>
                 </div>
-                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
-                    <div class="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center text-red-600 font-bold">NEFT</div>
+                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4" role="button" tabindex="0" onclick="showScreen('screen-recipient')" aria-label="Select NEFT – Batch Settlement">
+                    <div class="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center text-red-600 font-bold" aria-hidden="true">NEFT</div>
                     <div>
                         <h3 class="font-semibold text-gray-900">Batch Settlement</h3>
-                        <p class="text-xs text-gray-500">Settles every 30 mins • No upper limit</p>
+                        <p class="text-xs text-gray-500">Settles every 30 mins • No upper limit</p>
                     </div>
                 </div>
             </div>
-
-            <button onclick="showScreen('screen-recipient')" class="w-full hdfc-blue text-white py-4 rounded-xl font-semibold shadow-lg transition-transform active:scale-95">
-                Begin Transfer
-            </button>
-        </div>
-    </div>
+            <button class="w-full hdfc-blue text-white py-4 rounded-xl font-semibold shadow-lg transition-transform active:scale-95" onclick="showScreen('screen-recipient')" aria-label="Begin Transfer">Begin Transfer</button>
+        </section>
+    </main>
 
     <!-- Screen 2: Recipient Details -->
-    <div id="screen-recipient" class="screen fade-in">
+    <main id="screen-recipient" class="screen fade-in" tabindex="-1">
         <header class="bg-white border-b p-4 flex items-center gap-3">
-            <button onclick="showScreen('screen-entry')" class="p-2 text-gray-600">←</button>
-            <h1 class="text-xl font-semibold text-gray-900">Recipient Details</h1>
+            <button class="p-2 text-gray-600" onclick="showScreen('screen-entry')" aria-label="Back to entry"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
+            <h1 class="text-xl font-semibold" id="recipient-heading">Recipient Details</h1>
         </header>
-        <div class="p-4 pt-6">
-            <div class="mb-4">
-                <div class="flex justify-between text-xs text-gray-500 mb-2">
-                    <span>Step 1 of 3</span>
-                    <span>33%</span>
-                </div>
-                <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
-                    <div class="bg-blue-600 h-full" style="width: 33%"></div>
-                </div>
+        <section class="p-4 pt-6">
+            <div class="flex justify-between text-xs text-gray-500 mb-2">
+                <span>Step 1 of 4</span>
+                <span>25%</span>
             </div>
-
-            <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-5">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Recipient Name</label>
-                    <input type="text" placeholder="Enter full name" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Account Number</label>
-                    <input type="password" placeholder="Enter account number" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">IFSC Code</label>
-                    <input type="text" placeholder="HDFC0001234" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
+            <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden mb-4">
+                <div class="bg-blue-600 h-full" style="width: 25%"></div>
             </div>
+            <form id="recipient-form" novalidate>
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-5">
+                    <div>
+                        <label for="payee-name" class="block text-sm font-medium text-gray-700 mb-1">Recipient Name</label>
+                        <input type="text" id="payee-name" name="payee-name" placeholder="Enter full name" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required aria-describedby="payee-name-help">
+                        <p class="text-xs text-gray-500" id="payee-name-help">Full name as registered with the bank.</p>
+                    </div>
+                    <div>
+                        <label for="account-number" class="block text-sm font-medium text-gray-700 mb-1">Account Number</label>
+                        <input type="password" id="account-number" name="account-number" placeholder="Enter account number" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required pattern="\d{9,18}" aria-describedby="account-number-help">
+                        <p class="text-xs text-gray-500" id="account-number-help">9‑18 numeric digits.</p>
+                        <p class="text-xs text-red-600 hidden" id="account-number-error" role="alert" aria-live="assertive">Invalid account number.</p>
+                    </div>
+                    <div>
+                        <label for="ifsc-code" class="block text-sm font-medium text-gray-700 mb-1">IFSC Code</label>
+                        <input type="text" id="ifsc-code" name="ifsc-code" placeholder="HDFC0001234" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required pattern="[A-Z]{4}0[0-9A-Z]{6}" aria-describedby="ifsc-help">
+                        <p class="text-xs text-gray-500" id="ifsc-help">Format: XXXX0XXXXXX (e.g., HDFC0001234).</p>
+                        <p class="text-xs text-red-600 hidden" id="ifsc-error" role="alert" aria-live="assertive">Invalid IFSC code.</p>
+                    </div>
+                </div>
+                <button type="button" class="w-full hdfc-blue text-white py-4 rounded-xl font-semibold shadow-lg mt-8 transition-transform active:scale-95" onclick="validateRecipient()" aria-label="Continue to amount entry">Continue</button>
+            </form>
+        </section>
+    </main>
 
-            <button onclick="showScreen('screen-amount')" class="w-full hdfc-blue text-white py-4 rounded-xl font-semibold shadow-lg mt-8 transition-transform active:scale-95">
-                Continue
-            </button>
-        </div>
-    </div>
-
-    <!-- Screen 3: Amount -->
-    <div id="screen-amount" class="screen fade-in">
+    <!-- Screen 3: Amount Entry -->
+    <main id="screen-amount" class="screen fade-in" tabindex="-1">
         <header class="bg-white border-b p-4 flex items-center gap-3">
-            <button onclick="showScreen('screen-recipient')" class="p-2 text-gray-600">←</button>
-            <h1 class="text-xl font-semibold text-gray-900">Enter Amount</h1>
+            <button class="p-2 text-gray-600" onclick="showScreen('screen-recipient')" aria-label="Back to recipient details"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
+            <h1 class="text-xl font-semibold" id="amount-heading">Enter Amount</h1>
         </header>
-        <div class="p-4 pt-6">
-            <div class="mb-4">
-                <div class="flex justify-between text-xs text-gray-500 mb-2">
-                    <span>Step 2 of 3</span>
-                    <span>66%</span>
-                </div>
-                <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
-                    <div class="bg-blue-600 h-full" style="width: 66%"></div>
-                </div>
+        <section class="p-4 pt-6">
+            <div class="flex justify-between text-xs text-gray-500 mb-2">
+                <span>Step 2 of 4</span>
+                <span>50%</span>
             </div>
-
+            <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden mb-4">
+                <div class="bg-blue-600 h-full" style="width: 50%"></div>
+            </div>
             <div class="text-center py-10">
-                <p class="text-gray-500 text-sm mb-2">Transferring to RAHUL SHARMA</p>
+                <p class="text-gray-500 text-sm mb-2" id="amount-recipient-label">Transferring to <span id="summary-payee-name">[Payee]</span></p>
                 <div class="flex items-center justify-center gap-2">
-                    <span class="text-3xl font-bold text-gray-400">₹</span>
-                    <input type="number" value="25000" class="text-5xl font-bold text-gray-900 bg-transparent border-none w-48 text-center outline-none">
+                    <span class="text-3xl font-bold text-gray-400" aria-hidden="true">₹</span>
+                    <input type="number" id="transfer-amount" name="transfer-amount" value="25000" class="text-5xl font-bold text-gray-900 bg-transparent border-none w-48 text-center outline-none" aria-label="Transfer amount" required>
                 </div>
             </div>
-
             <div class="bg-white p-4 rounded-xl border border-gray-200 mb-8">
-                <label class="block text-xs font-medium text-gray-500 mb-1">Select Source Account</label>
+                <label for="source-account" class="block text-xs font-medium text-gray-500 mb-1">Select Source Account</label>
                 <div class="flex justify-between items-center">
                     <div>
-                        <p class="font-semibold text-gray-900">Savings Account ...210</p>
+                        <p class="font-semibold text-gray-900">Savings Account …210</p>
                         <p class="text-xs text-green-600">Balance: ₹1,42,500.00</p>
                     </div>
-                    <button class="text-blue-600 text-sm">Change</button>
+                    <button class="text-blue-600 text-sm" aria-label="Change source account">Change</button>
                 </div>
             </div>
-
-            <button onclick="showScreen('screen-success')" class="w-full hdfc-blue text-white py-4 rounded-xl font-semibold shadow-lg transition-transform active:scale-95">
-                Confirm Transfer
-            </button>
-        </div>
-    </div>
+            <button class="w-full hdfc-blue text-white py-4 rounded-xl font-semibold shadow-lg transition-transform active:scale-95" onclick="showScreen('screen-success')" aria-label="Confirm transfer">Confirm Transfer</button>
+        </section>
+    </main>
 
     <!-- Screen 4: Success -->
-    <div id="screen-success" class="screen fade-in">
-        <div class="min-h-screen bg-white flex flex-col items-center justify-center p-6">
-            <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-6">
-                <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+    <main id="screen-success" class="screen fade-in" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="success-heading">
+        <section class="min-h-screen bg-white flex flex-col items-center justify-center p-6">
+            <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-6" aria-hidden="true">
+                <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
             </div>
-            <h2 class="text-2xl font-bold text-gray-900 mb-2">Transfer Successful</h2>
+            <h2 class="text-2xl font-bold text-gray-900 mb-2" id="success-heading">Transfer Successful</h2>
             <p class="text-gray-600 text-center mb-8">Your money has been sent securely.</p>
-
             <div class="w-full bg-gray-50 rounded-2xl p-6 space-y-4 mb-8 border border-gray-100">
-                <div class="flex justify-between">
-                    <span class="text-gray-500 text-sm">Amount Sent</span>
-                    <span class="font-bold text-gray-900">₹25,000.00</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-500 text-sm">Recipient</span>
-                    <span class="font-semibold text-gray-900">Rahul Sharma</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-500 text-sm">Transaction ID</span>
-                    <span class="text-sm font-mono text-gray-600">TXN987654321</span>
-                </div>
+                <div class="flex justify-between"><span class="text-gray-500 text-sm">Amount Sent</span><span class="font-bold text-gray-900">₹25,000.00</span></div>
+                <div class="flex justify-between"><span class="text-gray-500 text-sm">Recipient</span><span class="font-semibold text-gray-900">Rahul Sharma</span></div>
+                <div class="flex justify-between"><span class="text-gray-500 text-sm">Transaction ID</span><span class="text-sm font-mono text-gray-600">TXN987654321</span></div>
             </div>
-
             <div class="w-full space-y-3">
-                <button class="w-full border border-gray-300 py-3 rounded-xl font-semibold text-gray-700 hover:bg-gray-50">Download Receipt</button>
-                <button onclick="showScreen('screen-entry')" class="w-full hdfc-blue text-white py-4 rounded-xl font-semibold shadow-lg">Done</button>
+                <button class="w-full border border-gray-300 py-3 rounded-xl font-semibold text-gray-700 hover:bg-gray-50" aria-label="Download receipt">Download Receipt</button>
+                <button class="w-full hdfc-blue text-white py-4 rounded-xl font-semibold shadow-lg" onclick="showScreen('screen-entry')" aria-label="Done">Done</button>
             </div>
-        </div>
-    </div>
+        </section>
+    </main>
 
     <script>
+        // ----------- Haptic Utility (progressive enhancement) -----------
+        const haptic = {
+            vibrate(pattern) { if (navigator.vibrate) { navigator.vibrate(pattern); } },
+            navigation() { this.vibrate([30, 30]); },
+            confirmation() { this.vibrate([50]); },
+            effort() { this.vibrate([20, 10, 20]); },
+            warning() { this.vibrate([100, 50, 100]); },
+            progress() { this.vibrate([30, 30, 30, 30]); }
+        };
+
+        // ----------- Live Region Helpers -----------
+        const politeLive = document.getElementById('polite-live');
+        const assertiveLive = document.getElementById('assertive-live');
+        function announcePolite(message) { politeLive.textContent = '';
+            requestAnimationFrame(() => { politeLive.textContent = message; }); }
+        function announceAssertive(message) { assertiveLive.textContent = '';
+            requestAnimationFrame(() => { assertiveLive.textContent = message; }); }
+
+        // ----------- Screen Navigation & Focus Management -----------
         function showScreen(screenId) {
+            // Hide all screens
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-            window.scrollTo(0, 0);
+            // Show target screen
+            const target = document.getElementById(screenId);
+            target.classList.add('active');
+            // Update document title
+            const titleMap = {
+                'screen-entry': 'One‑Time Transfer – Entry',
+                'screen-recipient': 'One‑Time Transfer – Recipient',
+                'screen-amount': 'One‑Time Transfer – Amount',
+                'screen-success': 'One‑Time Transfer – Success'
+            };
+            document.title = titleMap[screenId] || document.title;
+            // Move focus to first heading of target screen
+            const heading = target.querySelector('h1, h2, h3');
+            if (heading) {
+                heading.setAttribute('tabindex', '-1');
+                heading.focus();
+            }
+            // Announce screen change (polite)
+            const announcements = {
+                'screen-entry': 'Entry screen. Choose a transfer mode.',
+                'screen-recipient': 'Recipient details screen. Please enter payee information.',
+                'screen-amount': 'Amount entry screen. Enter transfer amount.',
+                'screen-success': 'Transfer successful screen.'
+            };
+            announcePolite(announcements[screenId] || '');
+            // Haptic feedback for navigation
+            haptic.navigation();
         }
+
+        // ----------- Validation for Recipient Form -----------
+        function validateRecipient() {
+            const account = document.getElementById('account-number');
+            const ifsc = document.getElementById('ifsc-code');
+            let valid = true;
+            // Reset previous errors
+            [account, ifsc].forEach(inp => { inp.setAttribute('aria-invalid', 'false'); inp.classList.remove('border-red-500'); });
+            // Account number validation
+            if (!account.checkValidity()) {
+                valid = false;
+                document.getElementById('account-number-error').classList.remove('hidden');
+                account.setAttribute('aria-invalid', 'true');
+                account.classList.add('border-red-500');
+                announceAssertive('Invalid account number.');
+                haptic.warning();
+            }
+            // IFSC validation
+            if (!ifsc.checkValidity()) {
+                valid = false;
+                document.getElementById('ifsc-error').classList.remove('hidden');
+                ifsc.setAttribute('aria-invalid', 'true');
+                ifsc.classList.add('border-red-500');
+                announceAssertive('Invalid IFSC code.');
+                haptic.warning();
+            }
+            if (valid) {
+                // Update summary text on amount screen
+                const name = document.getElementById('payee-name').value || '[Payee]';
+                document.getElementById('summary-payee-name').textContent = name;
+                showScreen('screen-amount');
+                haptic.confirmation();
+            }
+        }
+
+        // Ensure initial focus is on entry heading
+        document.addEventListener('DOMContentLoaded', () => {
+            const entryHeading = document.getElementById('entry-heading');
+            entryHeading.setAttribute('tabindex', '-1');
+            entryHeading.focus();
+        });
     </script>
 </body>
 </html>
