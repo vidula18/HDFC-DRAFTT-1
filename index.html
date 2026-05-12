@@ -8,10 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
-        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
         .hdfc-blue { background-color: #004d8c; }
-        .hdfc-red { background-color: #ed1c24; }
-        .success-green { color: #28a745; }
         .screen { display: none; min-height: 100vh; }
         .screen.active { display: block; }
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
@@ -20,7 +17,7 @@
     </style>
 </head>
 <body>
-    <!-- Polite and Assertive live regions (visually hidden) -->
+    <!-- Live Regions for Screen Reader Announcements -->
     <div id="polite-live" role="status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
     <div id="assertive-live" role="alert" aria-live="assertive" aria-atomic="true" class="sr-only"></div>
 
@@ -36,25 +33,25 @@
                     <svg class="w-10 h-10 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3-3v8a3 3 0 003 3z"></path></svg>
                 </div>
                 <h2 class="text-2xl font-bold text-gray-900" id="entry-heading">Send Money Instantly</h2>
-                <p class="text-gray-600 text-sm mt-2" id="entry-desc">Choose your preferred transfer mode to begin</p>
+                <p class="text-gray-600 text-sm mt-2">Choose your preferred transfer mode to begin</p>
             </div>
             <div class="space-y-4 mb-8">
-                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4" role="button" tabindex="0" onclick="showScreen('screen-recipient')" aria-label="Select IMPS – Instant Payment">
+                <!-- Added haptics.navigation() to selections -->
+                <button class="w-full bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4 text-left" onclick="selectTransferMode()">
                     <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 font-bold" aria-hidden="true">IMPS</div>
                     <div>
                         <h3 class="font-semibold text-gray-900">Instant Payment</h3>
                         <p class="text-xs text-gray-500">24x7 Availability • Real‑time settlement</p>
                     </div>
-                </div>
-                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4" role="button" tabindex="0" onclick="showScreen('screen-recipient')" aria-label="Select NEFT – Batch Settlement">
+                </button>
+                <button class="w-full bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4 text-left" onclick="selectTransferMode()">
                     <div class="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center text-red-600 font-bold" aria-hidden="true">NEFT</div>
                     <div>
                         <h3 class="font-semibold text-gray-900">Batch Settlement</h3>
                         <p class="text-xs text-gray-500">Settles every 30 mins • No upper limit</p>
                     </div>
-                </div>
+                </button>
             </div>
-            <button class="w-full hdfc-blue text-white py-4 rounded-xl font-semibold shadow-lg transition-transform active:scale-95" onclick="showScreen('screen-recipient')" aria-label="Begin Transfer">Begin Transfer</button>
         </section>
     </main>
 
@@ -62,37 +59,36 @@
     <main id="screen-recipient" class="screen fade-in" tabindex="-1">
         <header class="bg-white border-b p-4 flex items-center gap-3">
             <button class="p-2 text-gray-600" onclick="showScreen('screen-entry')" aria-label="Back to entry"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
-            <h1 class="text-xl font-semibold" id="recipient-heading">Recipient Details</h1>
+            <h1 class="text-xl font-semibold">Recipient Details</h1>
         </header>
         <section class="p-4 pt-6">
             <div class="flex justify-between text-xs text-gray-500 mb-2" aria-hidden="true">
-                <span>Step 1 of 4</span>
-                <span>25%</span>
+                <span>Step 1 of 4</span><span>25%</span>
             </div>
             <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden mb-4" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" aria-label="Step 1 of 4, 25% complete">
                 <div class="bg-blue-600 h-full" style="width: 25%"></div>
             </div>
-            <form id="recipient-form" novalidate>
+            <form id="recipient-form" novalidate onsubmit="event.preventDefault(); validateRecipient();">
                 <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-5">
                     <div>
                         <label for="payee-name" class="block text-sm font-medium text-gray-700 mb-1">Recipient Name</label>
-                        <input type="text" id="payee-name" name="payee-name" placeholder="Enter full name" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required aria-describedby="payee-name-help">
+                        <input type="text" id="payee-name" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required aria-describedby="payee-name-help" onblur="checkEmptyField(this)">
                         <p class="text-xs text-gray-500" id="payee-name-help">Full name as registered with the bank.</p>
                     </div>
                     <div>
                         <label for="account-number" class="block text-sm font-medium text-gray-700 mb-1">Account Number</label>
-                        <input type="password" id="account-number" name="account-number" placeholder="Enter account number" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required pattern="\d{9,18}" aria-describedby="account-number-help account-number-error">
+                        <input type="password" id="account-number" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required pattern="\d{9,18}" aria-describedby="account-number-help account-number-error" onblur="checkEmptyField(this)">
                         <p class="text-xs text-gray-500" id="account-number-help">9‑18 numeric digits.</p>
-                        <p class="text-xs text-red-600 hidden" id="account-number-error" role="alert" aria-live="assertive">Invalid account number. Please check the 9 to 18 digits.</p>
+                        <p class="text-xs text-red-600 hidden" id="account-number-error" role="alert" aria-live="assertive">Invalid account number. Must be 9-18 digits.</p>
                     </div>
                     <div>
                         <label for="ifsc-code" class="block text-sm font-medium text-gray-700 mb-1">IFSC Code</label>
-                        <input type="text" id="ifsc-code" name="ifsc-code" placeholder="HDFC0001234" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required pattern="[A-Z]{4}0[0-9A-Z]{6}" aria-describedby="ifsc-help ifsc-error">
+                        <input type="text" id="ifsc-code" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none uppercase" required pattern="[A-Z]{4}0[0-9A-Z]{6}" aria-describedby="ifsc-help ifsc-error" onblur="checkEmptyField(this)">
                         <p class="text-xs text-gray-500" id="ifsc-help">Format: XXXX0XXXXXX (e.g., HDFC0001234).</p>
                         <p class="text-xs text-red-600 hidden" id="ifsc-error" role="alert" aria-live="assertive">Invalid IFSC code. Must be 11 characters.</p>
                     </div>
                 </div>
-                <button type="button" class="w-full hdfc-blue text-white py-4 rounded-xl font-semibold shadow-lg mt-8 transition-transform active:scale-95" onclick="validateRecipient()" aria-label="Continue to amount entry">Continue</button>
+                <button type="submit" class="w-full hdfc-blue text-white py-4 rounded-xl font-semibold shadow-lg mt-8 transition-transform active:scale-95" aria-label="Continue to amount entry">Continue</button>
             </form>
         </section>
     </main>
@@ -101,153 +97,355 @@
     <main id="screen-amount" class="screen fade-in" tabindex="-1">
         <header class="bg-white border-b p-4 flex items-center gap-3">
             <button class="p-2 text-gray-600" onclick="showScreen('screen-recipient')" aria-label="Back to recipient details"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
-            <h1 class="text-xl font-semibold" id="amount-heading">Enter Amount</h1>
+            <h1 class="text-xl font-semibold">Enter Amount</h1>
         </header>
         <section class="p-4 pt-6">
             <div class="flex justify-between text-xs text-gray-500 mb-2" aria-hidden="true">
-                <span>Step 2 of 4</span>
-                <span>50%</span>
+                <span>Step 2 of 4</span><span>50%</span>
             </div>
             <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden mb-4" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" aria-label="Step 2 of 4, 50% complete">
                 <div class="bg-blue-600 h-full" style="width: 50%"></div>
             </div>
             <div class="text-center py-10">
-                <p class="text-gray-500 text-sm mb-2" id="amount-recipient-label">Transferring to <span id="summary-payee-name">[Payee]</span></p>
+                <p class="text-gray-500 text-sm mb-2">Transferring to <span id="summary-payee-name" class="font-semibold text-gray-900">[Payee]</span></p>
                 <div class="flex items-center justify-center gap-2">
                     <span class="text-3xl font-bold text-gray-400" aria-hidden="true">₹</span>
-                    <input type="number" id="transfer-amount" name="transfer-amount" value="25000" class="text-5xl font-bold text-gray-900 bg-transparent border-none w-48 text-center outline-none" aria-label="Transfer amount" required>
+                    <input type="number" id="transfer-amount" value="" placeholder="0.00" class="text-5xl font-bold text-gray-900 bg-transparent border-none w-48 text-center outline-none" aria-label="Transfer amount" onblur="checkEmptyField(this)">
                 </div>
+                <p class="text-xs text-red-600 hidden mt-2" id="amount-error" role="alert" aria-live="assertive">Please enter a valid amount.</p>
             </div>
             <div class="bg-white p-4 rounded-xl border border-gray-200 mb-8">
-                <label for="source-account" class="block text-xs font-medium text-gray-500 mb-1">Select Source Account</label>
+                <label class="block text-xs font-medium text-gray-500 mb-1">Select Source Account</label>
                 <div class="flex justify-between items-center">
                     <div>
                         <p class="font-semibold text-gray-900">Savings Account …210</p>
                         <p class="text-xs text-green-600">Balance: ₹1,42,500.00</p>
                     </div>
-                    <button class="text-blue-600 text-sm" aria-label="Change source account">Change</button>
                 </div>
             </div>
-            <button class="w-full hdfc-blue text-white py-4 rounded-xl font-semibold shadow-lg transition-transform active:scale-95" onclick="showScreen('screen-success')" aria-label="Confirm transfer">Confirm Transfer</button>
+            <button class="w-full hdfc-blue text-white py-4 rounded-xl font-semibold shadow-lg transition-transform active:scale-95" onclick="validateAmount()" aria-label="Proceed to review">Proceed to Review</button>
         </section>
     </main>
 
-    <!-- Screen 4: Success -->
+    <!-- Screen 4: Review and Confirm (NEW) -->
+    <main id="screen-review" class="screen fade-in" tabindex="-1">
+        <header class="bg-white border-b p-4 flex items-center gap-3">
+            <button class="p-2 text-gray-600" onclick="showScreen('screen-amount')" aria-label="Back to amount entry"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
+            <h1 class="text-xl font-semibold">Review & Confirm</h1>
+        </header>
+        <section class="p-4 pt-6">
+            <div class="flex justify-between text-xs text-gray-500 mb-2" aria-hidden="true">
+                <span>Step 3 of 4</span><span>75%</span>
+            </div>
+            <div class="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden mb-6" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" aria-label="Step 3 of 4, 75% complete">
+                <div class="bg-blue-600 h-full" style="width: 75%"></div>
+            </div>
+            
+            <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-4 mb-8">
+                <div>
+                    <p class="text-xs text-gray-500">To</p>
+                    <p class="font-bold text-gray-900 text-lg" id="review-payee-name">[Payee Name]</p>
+                    <p class="text-sm text-gray-600" id="review-account-num">Account: [Acc Number]</p>
+                </div>
+                <div class="border-t border-gray-100 pt-4">
+                    <p class="text-xs text-gray-500">Amount to Transfer</p>
+                    <p class="font-bold text-gray-900 text-2xl" id="review-amount">₹0.00</p>
+                </div>
+                <div class="border-t border-gray-100 pt-4">
+                    <p class="text-xs text-gray-500">From</p>
+                    <p class="font-semibold text-gray-900">Savings Account …210</p>
+                </div>
+            </div>
+            <button class="w-full hdfc-blue text-white py-4 rounded-xl font-semibold shadow-lg transition-transform active:scale-95" onclick="showScreen('screen-mpin')" aria-label="Confirm details and proceed to mPIN">Confirm & Proceed</button>
+        </section>
+    </main>
+
+    <!-- Screen 5: mPIN Entry (NEW) -->
+    <main id="screen-mpin" class="screen fade-in" tabindex="-1">
+        <header class="bg-white border-b p-4 flex items-center gap-3">
+            <button class="p-2 text-gray-600" onclick="showScreen('screen-review')" aria-label="Back to review"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg></button>
+            <h1 class="text-xl font-semibold">Enter mPIN</h1>
+        </header>
+        <section class="p-4 pt-10 text-center">
+            <p class="text-gray-600 mb-6">Enter your 4-digit mPIN to securely authorize this transfer of <span class="font-bold text-gray-900" id="mpin-amount">₹0.00</span></p>
+            <div class="flex justify-center mb-8">
+                <input type="password" id="mpin-input" maxlength="4" class="text-4xl font-bold tracking-[1em] text-center w-48 p-4 border-b-2 border-gray-300 focus:border-blue-600 outline-none bg-transparent" aria-label="4 digit mPIN" aria-describedby="mpin-error" onblur="checkEmptyField(this)">
+            </div>
+            <p class="text-xs text-red-600 hidden mb-6" id="mpin-error" role="alert" aria-live="assertive">Please enter a valid 4-digit mPIN.</p>
+            <button class="w-full hdfc-blue text-white py-4 rounded-xl font-semibold shadow-lg transition-transform active:scale-95" onclick="submitTransfer()" aria-label="Submit transfer">Submit Payment</button>
+        </section>
+    </main>
+
+    <!-- Screen 6: Success -->
     <main id="screen-success" class="screen fade-in" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="success-heading">
         <section class="min-h-screen bg-white flex flex-col items-center justify-center p-6">
             <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-6" aria-hidden="true">
-                <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
             </div>
             <h2 class="text-2xl font-bold text-gray-900 mb-2" id="success-heading">Transfer Successful</h2>
             <p class="text-gray-600 text-center mb-8">Your money has been sent securely.</p>
             <div class="w-full bg-gray-50 rounded-2xl p-6 space-y-4 mb-8 border border-gray-100">
-                <div class="flex justify-between"><span class="text-gray-500 text-sm">Amount Sent</span><span class="font-bold text-gray-900">₹25,000.00</span></div>
-                <div class="flex justify-between"><span class="text-gray-500 text-sm">Recipient</span><span class="font-semibold text-gray-900">Rahul Sharma</span></div>
+                <div class="flex justify-between"><span class="text-gray-500 text-sm">Amount Sent</span><span class="font-bold text-gray-900" id="success-amount">₹0.00</span></div>
+                <div class="flex justify-between"><span class="text-gray-500 text-sm">Recipient</span><span class="font-semibold text-gray-900" id="success-payee">[Payee]</span></div>
                 <div class="flex justify-between"><span class="text-gray-500 text-sm">Transaction ID</span><span class="text-sm font-mono text-gray-600">TXN987654321</span></div>
             </div>
             <div class="w-full space-y-3">
                 <button class="w-full border border-gray-300 py-3 rounded-xl font-semibold text-gray-700 hover:bg-gray-50" aria-label="Download receipt">Download Receipt</button>
-                <button class="w-full hdfc-blue text-white py-4 rounded-xl font-semibold shadow-lg" onclick="showScreen('screen-entry')" aria-label="Done">Done</button>
+                <button class="w-full hdfc-blue text-white py-4 rounded-xl font-semibold shadow-lg" onclick="resetFlow()" aria-label="Done">Done</button>
             </div>
         </section>
     </main>
 
+    <!-- Screen 7: Failure (NEW) -->
+    <main id="screen-failure" class="screen fade-in" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="failure-heading">
+        <section class="min-h-screen bg-white flex flex-col items-center justify-center p-6">
+            <div class="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mb-6" aria-hidden="true">
+                <svg class="w-12 h-12 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-2" id="failure-heading">Transfer Failed</h2>
+            <p class="text-gray-600 text-center mb-8">We could not process your transaction due to an incorrect mPIN.</p>
+            <button class="w-full hdfc-blue text-white py-4 rounded-xl font-semibold shadow-lg" onclick="showScreen('screen-mpin')" aria-label="Try Again">Try Again</button>
+        </section>
+    </main>
+
     <script>
-        // ----------- Haptic Utility (progressive enhancement) -----------
-        const haptic = {
-            vibrate(pattern) { if (navigator.vibrate) { navigator.vibrate(pattern); } },
-            navigation() { this.vibrate([30, 30]); },
-            confirmation() { this.vibrate([50]); },
-            effort() { this.vibrate([20, 10, 20]); },
-            warning() { this.vibrate([100, 50, 100]); },
-            progress() { this.vibrate([30, 30, 30, 30]); }
+        // ----------- Core Haptic Accessibility Architecture -----------
+        const haptics = {
+            isSupported: !!(navigator && navigator.vibrate),
+            progressInterval: null,
+
+            trigger(pattern) {
+                if (this.isSupported) {
+                    try { navigator.vibrate(pattern); } catch(e) {}
+                }
+            },
+            
+            // Meaning: successful completion, valid entry, accepted action
+            confirmation() { this.trigger(50); },
+            
+            // Meaning: user input or corrective action is needed (short sharp high-frequency bursts)
+            effort() { this.trigger([20, 30, 20]); },
+            
+            // Meaning: caution, risk, high-attention state, critical validation issue
+            warning() { this.trigger([100, 50, 100, 50, 100]); },
+            
+            // Meaning: movement into a new step, section, or important state change
+            navigation() { this.trigger([30, 40, 30]); },
+            
+            // Meaning: something is being processed in the background
+            startProgress() {
+                if (!this.isSupported) return;
+                this.stopProgress();
+                this.trigger([30]);
+                this.progressInterval = setInterval(() => { this.trigger([30]); }, 500);
+            },
+            stopProgress() {
+                if (this.progressInterval) {
+                    clearInterval(this.progressInterval);
+                    this.progressInterval = null;
+                }
+            }
         };
 
         // ----------- Live Region Helpers -----------
         const politeLive = document.getElementById('polite-live');
         const assertiveLive = document.getElementById('assertive-live');
-        function announcePolite(message) { politeLive.textContent = '';
-            requestAnimationFrame(() => { politeLive.textContent = message; }); }
-        function announceAssertive(message) { assertiveLive.textContent = '';
-            requestAnimationFrame(() => { assertiveLive.textContent = message; }); }
+        function announcePolite(message) { 
+            politeLive.textContent = '';
+            requestAnimationFrame(() => { politeLive.textContent = message; }); 
+        }
+        function announceAssertive(message) { 
+            assertiveLive.textContent = '';
+            requestAnimationFrame(() => { assertiveLive.textContent = message; }); 
+        }
+
+        // ----------- Global State -----------
+        let transferData = {
+            payeeName: '',
+            accountNumber: '',
+            amount: ''
+        };
+
+        // ----------- Input "Effort" Feedback -----------
+        function checkEmptyField(inputElement) {
+            if (inputElement.value.trim() === '') {
+                haptics.effort();
+            }
+        }
 
         // ----------- Screen Navigation & Focus Management -----------
-        function showScreen(screenId) {
-            // Hide all screens
+        function showScreen(screenId, suppressNavigationHaptic = false) {
+            // Stop any lingering progress
+            haptics.stopProgress();
+
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            // Show target screen
             const target = document.getElementById(screenId);
             target.classList.add('active');
-            // Update document title
-            const titleMap = {
-                'screen-entry': 'One‑Time Transfer – Entry',
-                'screen-recipient': 'One‑Time Transfer – Recipient',
-                'screen-amount': 'One‑Time Transfer – Amount',
-                'screen-success': 'One‑Time Transfer – Success'
+            
+            // Announce Screen Summary
+            const summaries = {
+                'screen-entry': 'One-Time Transfer Entry. Choose your preferred transfer mode to begin. Swipe or tab to select IMPS or NEFT.',
+                'screen-recipient': 'Recipient Details. Step 1 of 4, 25% complete. Enter payee full name, account number, and IFSC code.',
+                'screen-amount': `Amount Entry. Step 2 of 4, 50% complete. Transferring to ${transferData.payeeName || 'new payee'}. Enter the transfer amount.`,
+                'screen-review': `Review and Confirm. Step 3 of 4, 75% complete. Reviewing transfer of ₹${transferData.amount} to ${transferData.payeeName}. Swipe to proceed to mPIN entry.`,
+                'screen-mpin': `mPIN Authorization. Step 4 of 4. Enter your 4-digit mPIN to securely authorize this debit of ₹${transferData.amount}.`,
+                'screen-success': `Transfer Successful. Your money has been sent securely. Amount sent: ₹${transferData.amount}.`,
+                'screen-failure': `Transfer Failed. Incorrect mPIN entered. Swipe to try again.`
             };
-            document.title = titleMap[screenId] || document.title;
-            // Move focus to first heading of target screen
+            announcePolite(summaries[screenId] || '');
+
+            // Specific state haptics (Navigation vs Warning vs Confirmation)
+            if (screenId === 'screen-failure') {
+                haptics.warning();
+                announceAssertive('Transfer Failed. Warning: Incorrect mPIN entered.');
+            } else if (screenId === 'screen-success') {
+                haptics.confirmation();
+            } else if (!suppressNavigationHaptic) {
+                haptics.navigation();
+            }
+
+            // Move focus to first heading
             const heading = target.querySelector('h1, h2, h3');
             if (heading) {
                 heading.setAttribute('tabindex', '-1');
                 heading.focus();
             }
-            // Announce screen change (polite)
-            const payeeName = document.getElementById('summary-payee-name') ? document.getElementById('summary-payee-name').textContent : '[Payee]';
-            const announcements = {
-                'screen-entry': 'One-Time Transfer Entry. Choose your preferred transfer mode to begin. Two options available: IMPS and NEFT. Swipe or tab to select a mode.',
-                'screen-recipient': 'Recipient Details. Step 1 of 4, 25% complete. Enter payee full name, account number, and IFSC code. Swipe or tab to the Recipient Name field to start typing.',
-                'screen-amount': `Amount Entry. Step 2 of 4, 50% complete. Transferring to ${payeeName}. Enter the transfer amount and verify the source account. Swipe or tab to the Transfer Amount field.`,
-                'screen-success': `Transfer Successful. Your money has been sent securely. Amount sent: ₹25,000.00 to ${payeeName}. Swipe or tab to review transaction details or download your receipt.`
-            };
-            announcePolite(announcements[screenId] || '');
-            // Haptic feedback for navigation
-            haptic.navigation();
         }
 
-        // ----------- Validation for Recipient Form -----------
+        // ----------- Actions & Logic -----------
+        function selectTransferMode() {
+            haptics.confirmation(); // Acknowledge selection
+            showScreen('screen-recipient');
+        }
+
         function validateRecipient() {
+            const nameInp = document.getElementById('payee-name');
             const account = document.getElementById('account-number');
             const ifsc = document.getElementById('ifsc-code');
             let valid = true;
-            // Reset previous errors
-            [account, ifsc].forEach(inp => { inp.setAttribute('aria-invalid', 'false'); inp.classList.remove('border-red-500'); });
             let firstInvalid = null;
-            
-            // Account number validation
+
+            [account, ifsc].forEach(inp => { 
+                inp.setAttribute('aria-invalid', 'false'); 
+                inp.classList.remove('border-red-500'); 
+            });
+            document.getElementById('account-number-error').classList.add('hidden');
+            document.getElementById('ifsc-error').classList.add('hidden');
+
             if (!account.checkValidity()) {
                 valid = false;
                 document.getElementById('account-number-error').classList.remove('hidden');
                 account.setAttribute('aria-invalid', 'true');
                 account.classList.add('border-red-500');
-                announceAssertive('Invalid account number. Please check the 9 to 18 digits.');
-                haptic.warning();
+                announceAssertive('Warning: Invalid account number. Please check the 9 to 18 digits.');
+                haptics.warning();
                 firstInvalid = firstInvalid || account;
             }
-            // IFSC validation
             if (!ifsc.checkValidity()) {
                 valid = false;
                 document.getElementById('ifsc-error').classList.remove('hidden');
                 ifsc.setAttribute('aria-invalid', 'true');
                 ifsc.classList.add('border-red-500');
-                announceAssertive('Invalid IFSC code. Must be 11 characters.');
-                haptic.warning();
+                if (!firstInvalid) { // Avoid double announcement if both fail
+                    announceAssertive('Warning: Invalid IFSC code. Must be 11 characters.');
+                    haptics.warning();
+                }
                 firstInvalid = firstInvalid || ifsc;
             }
             
             if (!valid && firstInvalid) {
                 firstInvalid.focus();
+                return;
             }
-            if (valid) {
-                // Update summary text on amount screen
-                const name = document.getElementById('payee-name').value || '[Payee]';
-                document.getElementById('summary-payee-name').textContent = name;
-                showScreen('screen-amount');
-                haptic.confirmation();
-            }
+
+            // Valid - Save data and simulate progress
+            transferData.payeeName = nameInp.value || '[Payee]';
+            transferData.accountNumber = account.value;
+            
+            document.getElementById('summary-payee-name').textContent = transferData.payeeName;
+            document.getElementById('review-payee-name').textContent = transferData.payeeName;
+            // Mask account number for review
+            const maskedAcc = 'xxxx' + transferData.accountNumber.slice(-4);
+            document.getElementById('review-account-num').textContent = `Account: ${maskedAcc}`;
+
+            // Simulate payee verification network call
+            haptics.startProgress();
+            announcePolite('Verifying payee details in background...');
+            setTimeout(() => {
+                haptics.stopProgress();
+                haptics.confirmation();
+                showScreen('screen-amount', true); // Suppress navigation haptic to let confirmation shine
+            }, 1500);
         }
 
-        // Ensure initial focus is on entry heading
+        function validateAmount() {
+            const amountInp = document.getElementById('transfer-amount');
+            const err = document.getElementById('amount-error');
+            const amount = amountInp.value;
+
+            if (!amount || Number(amount) <= 0) {
+                amountInp.setAttribute('aria-invalid', 'true');
+                err.classList.remove('hidden');
+                announceAssertive('Warning: Please enter a valid transfer amount.');
+                haptics.warning();
+                amountInp.focus();
+                return;
+            }
+
+            err.classList.add('hidden');
+            amountInp.setAttribute('aria-invalid', 'false');
+            
+            transferData.amount = amount;
+            // Format with commas
+            const formatted = '₹' + Number(amount).toLocaleString('en-IN');
+            document.getElementById('review-amount').textContent = formatted;
+            document.getElementById('mpin-amount').textContent = formatted;
+            document.getElementById('success-amount').textContent = formatted;
+            document.getElementById('success-payee').textContent = transferData.payeeName;
+
+            haptics.confirmation();
+            showScreen('screen-review', true);
+        }
+
+        function submitTransfer() {
+            const mpin = document.getElementById('mpin-input');
+            const err = document.getElementById('mpin-error');
+            
+            if (mpin.value.length !== 4) {
+                mpin.setAttribute('aria-invalid', 'true');
+                err.classList.remove('hidden');
+                announceAssertive('Warning: Please enter a valid 4-digit mPIN.');
+                haptics.warning();
+                mpin.focus();
+                return;
+            }
+
+            // Simulate Payment Processing
+            err.classList.add('hidden');
+            mpin.setAttribute('aria-invalid', 'false');
+            haptics.startProgress();
+            announcePolite('Processing payment. Please wait.');
+            
+            setTimeout(() => {
+                haptics.stopProgress();
+                // Simulate success or failure (for demo, let's say "0000" fails)
+                if (mpin.value === '0000') {
+                    showScreen('screen-failure'); // warning haptic handled in showScreen
+                } else {
+                    showScreen('screen-success'); // confirmation haptic handled in showScreen
+                }
+            }, 2000);
+        }
+
+        function resetFlow() {
+            // Reset fields
+            document.getElementById('recipient-form').reset();
+            document.getElementById('transfer-amount').value = '';
+            document.getElementById('mpin-input').value = '';
+            showScreen('screen-entry');
+        }
+
+        // Initialize focus on load
         document.addEventListener('DOMContentLoaded', () => {
             const entryHeading = document.getElementById('entry-heading');
             entryHeading.setAttribute('tabindex', '-1');
