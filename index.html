@@ -17,6 +17,12 @@
     </style>
 </head>
 <body>
+    <!-- Floating Audio Toggle for Sighted Prototype Testing -->
+    <button id="enable-audio-btn" class="fixed bottom-6 right-6 hdfc-blue text-white p-4 rounded-full shadow-2xl z-50 flex items-center gap-2 transition-transform active:scale-95" onclick="enableAudio()" aria-label="Enable Audio Guide">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5 11h4l5-5v12l-5-5H5v-4z"></path></svg>
+        <span class="text-sm font-semibold pr-2">Enable Audio</span>
+    </button>
+
     <!-- Live Regions for Screen Reader Announcements -->
     <div id="polite-live" role="status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
     <div id="assertive-live" role="alert" aria-live="assertive" aria-atomic="true" class="sr-only"></div>
@@ -247,16 +253,37 @@
             }
         };
 
+        // ----------- Web Speech API (For Sighted Prototyping) -----------
+        let audioEnabled = false;
+        function enableAudio() {
+            audioEnabled = true;
+            document.getElementById('enable-audio-btn').style.display = 'none';
+            // Speak the initial screen summary to unlock audio context
+            speakText('Audio guide enabled. One-Time Transfer Entry. Choose your preferred transfer mode to begin.');
+        }
+
+        function speakText(message) {
+            if (audioEnabled && 'speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Stop any currently playing audio
+                const utterance = new SpeechSynthesisUtterance(message);
+                // Optional: Slightly tweak rate/pitch for a better default voice
+                utterance.rate = 1.0;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
         // ----------- Live Region Helpers -----------
         const politeLive = document.getElementById('polite-live');
         const assertiveLive = document.getElementById('assertive-live');
         function announcePolite(message) { 
             politeLive.textContent = '';
             requestAnimationFrame(() => { politeLive.textContent = message; }); 
+            speakText(message);
         }
         function announceAssertive(message) { 
             assertiveLive.textContent = '';
             requestAnimationFrame(() => { assertiveLive.textContent = message; }); 
+            speakText(message);
         }
 
         // ----------- Global State -----------
