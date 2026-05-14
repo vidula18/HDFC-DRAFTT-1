@@ -77,21 +77,21 @@
             <form id="recipient-form" novalidate onsubmit="event.preventDefault(); validateRecipient();">
                 <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm space-y-5">
                     <div>
-                        <label for="payee-name" class="block text-sm font-medium text-gray-700 mb-1">Recipient Name</label>
+                        <label for="payee-name" class="block text-sm font-medium text-gray-700">Recipient Name</label>
+                        <p class="text-xs text-gray-500 mb-2" id="payee-name-help">Full name as registered with the bank.</p>
                         <input type="text" id="payee-name" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required aria-describedby="payee-name-help" onblur="checkEmptyField(this)">
-                        <p class="text-xs text-gray-500" id="payee-name-help">Full name as registered with the bank.</p>
                     </div>
                     <div>
-                        <label for="account-number" class="block text-sm font-medium text-gray-700 mb-1">Account Number</label>
+                        <label for="account-number" class="block text-sm font-medium text-gray-700">Account Number</label>
+                        <p class="text-xs text-gray-500 mb-2" id="account-number-help">9‑18 numeric digits.</p>
                         <input type="password" id="account-number" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" required pattern="\d{9,18}" aria-describedby="account-number-help account-number-error" onblur="checkEmptyField(this)">
-                        <p class="text-xs text-gray-500" id="account-number-help">9‑18 numeric digits.</p>
-                        <p class="text-xs text-red-600 hidden" id="account-number-error" role="alert" aria-live="assertive">Invalid account number. Must be 9-18 digits.</p>
+                        <p class="text-xs text-red-600 hidden mt-1" id="account-number-error" role="alert" aria-live="assertive">Invalid account number. Must be 9-18 digits.</p>
                     </div>
                     <div>
-                        <label for="ifsc-code" class="block text-sm font-medium text-gray-700 mb-1">IFSC Code</label>
+                        <label for="ifsc-code" class="block text-sm font-medium text-gray-700">IFSC Code</label>
+                        <p class="text-xs text-gray-500 mb-2" id="ifsc-help">Format: XXXX0XXXXXX (e.g., HDFC0001234).</p>
                         <input type="text" id="ifsc-code" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none uppercase" required pattern="[A-Z]{4}0[0-9A-Z]{6}" aria-describedby="ifsc-help ifsc-error" onblur="checkEmptyField(this)">
-                        <p class="text-xs text-gray-500" id="ifsc-help">Format: XXXX0XXXXXX (e.g., HDFC0001234).</p>
-                        <p class="text-xs text-red-600 hidden" id="ifsc-error" role="alert" aria-live="assertive">Invalid IFSC code. Must be 11 characters.</p>
+                        <p class="text-xs text-red-600 hidden mt-1" id="ifsc-error" role="alert" aria-live="assertive">Invalid IFSC code. Must be 11 characters.</p>
                     </div>
                 </div>
                 <button type="submit" class="w-full hdfc-blue text-white py-4 rounded-xl font-semibold shadow-lg mt-8 transition-transform active:scale-95" aria-label="Continue to amount entry">Continue</button>
